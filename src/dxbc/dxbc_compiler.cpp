@@ -5646,6 +5646,22 @@ namespace dxvk {
       auto sv    = svMapping.sv;
       auto mask  = svMapping.regMask;
       auto value = emitValueLoad(outputReg);
+
+      if (svMapping.sv == DxbcSystemValue::Position) {
+        uint32_t f32_t  = m_module.defFloatType(32);
+        uint32_t vec_t  = getVectorTypeId(value.type);
+        uint32_t wIndex = 3;
+
+        uint32_t w   = m_module.opCompositeExtract(f32_t, value.id, 1, &wIndex);
+        uint32_t rhw = m_module.opFDiv(f32_t, m_module.constf32(1.0f), w);
+
+        // A nice way to do some vertex rounding that gets worse the closer
+        // you are that doesn't completely break games (usually).
+        // round(gl_Position * w) / w
+        value.id = m_module.opVectorTimesScalar(vec_t, value.id, w);
+        value.id = m_module.opRound(vec_t, value.id);
+        value.id = m_module.opVectorTimesScalar(vec_t, value.id, rhw);
+      }
       
       switch (m_programInfo.type()) {
         case DxbcProgramType::VertexShader:   emitVsSystemValueStore(sv, mask, value); break;
