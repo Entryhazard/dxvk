@@ -5661,6 +5661,12 @@ namespace dxvk {
         value.id = m_module.opVectorTimesScalar(vec_t, value.id, w);
         value.id = m_module.opRound(vec_t, value.id);
         value.id = m_module.opVectorTimesScalar(vec_t, value.id, rhw);
+
+        // Bodge the texture filtering without no perspective.
+        // manually divide by w (* rwh)
+        // and set w = 1
+        value.id = m_module.opVectorTimesScalar(vec_t, value.id, rhw);
+        value.id = m_module.opCompositeInsert(vec_t, m_module.constf32(1.0f), value.id, 1, &wIndex);
       }
       
       switch (m_programInfo.type()) {
