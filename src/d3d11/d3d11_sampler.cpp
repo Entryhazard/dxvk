@@ -8,6 +8,9 @@ namespace dxvk {
           D3D11Device*        device,
     const D3D11_SAMPLER_DESC& desc)
   : m_device(device), m_desc(desc), m_d3d10(this) {
+    m_desc.MinLOD = 4;
+    m_desc.MaxLOD = std::max(m_desc.MinLOD, m_desc.MaxLOD);
+
     DxvkSamplerCreateInfo info;
     
     // While D3D11_FILTER is technically an enum, its value bits
@@ -20,8 +23,8 @@ namespace dxvk {
     // stored directly in the sampler description
     info.mipmapMode     = (filterBits & 0x01) ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
     info.mipmapLodBias  = desc.MipLODBias;
-    info.mipmapLodMin   = desc.MinLOD;
-    info.mipmapLodMax   = desc.MaxLOD;
+    info.mipmapLodMin   = m_desc.MinLOD;
+    info.mipmapLodMax   = m_desc.MaxLOD;
     
     info.useAnisotropy  = false;
     info.maxAnisotropy  = 1.0f;
