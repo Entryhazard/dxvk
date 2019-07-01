@@ -13,8 +13,8 @@ namespace dxvk {
     // While D3D11_FILTER is technically an enum, its value bits
     // can be used to decode the filter properties more efficiently.
     const uint32_t filterBits = uint32_t(desc.Filter);
-    info.magFilter      = (filterBits & 0x04) ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
-    info.minFilter      = (filterBits & 0x10) ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
+    info.magFilter     = VK_FILTER_NEAREST;
+    info.minFilter     = VK_FILTER_NEAREST;
     
     // Set up the remaining properties, which are
     // stored directly in the sampler description
@@ -23,8 +23,8 @@ namespace dxvk {
     info.mipmapLodMin   = desc.MinLOD;
     info.mipmapLodMax   = desc.MaxLOD;
     
-    info.useAnisotropy  = (filterBits & 0x40) ? VK_TRUE : VK_FALSE;
-    info.maxAnisotropy  = float(desc.MaxAnisotropy);
+    info.useAnisotropy  = false;
+    info.maxAnisotropy  = 1.0f;
     
     info.addressModeU   = DecodeAddressMode(desc.AddressU);
     info.addressModeV   = DecodeAddressMode(desc.AddressV);
